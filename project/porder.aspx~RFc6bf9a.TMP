@@ -1,0 +1,191 @@
+<%@ Page Language="C#" MasterPageFile="~/Mastermenu.master" AutoEventWireup="true" CodeFile="porder.aspx.cs" Inherits="porder" Title="Untitled Page" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <div style="text-align: center">
+        <span style="color: #ffffff"></span>
+        <center>
+            <table style="font-weight: bold; width: 722px; height: 392px">
+                <tr>
+                    <td style="width: 100px; height: 517px">
+                        <span style="color: #ffffff">
+                            <asp:Panel ID="Panel1" runat="server">
+                                <div style="text-align: center">
+                                    <br />
+                                    <span style="font-size: 24pt">PURCHASE O<span style="text-decoration: underline">RDER<br />
+                                    </span></span>
+                                    <br />
+                                    <table style="width: 722px; height: 209px">
+                                        <tr>
+                                            <td style="width: 100px; height: 40px">
+                                                PURCHASE ORDER NO :</td>
+                                            <td style="width: 100px; height: 40px">
+                                                <asp:TextBox ID="TextBox1" runat="server" ForeColor="White" Style="background-color: transparent"></asp:TextBox></td>
+                                            <td style="width: 100px; height: 40px">
+                                                ORDER DATE :</td>
+                                            <td style="width: 100px; height: 40px">
+                                                <asp:TextBox ID="TextBox2" runat="server" ForeColor="White" Style="background-color: transparent"></asp:TextBox></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" style="height: 290px; text-align: center">
+                                                <div style="text-align: left">
+                                                    <table style="height: 75px">
+                                                        <tr>
+                                                            <td style="width: 100px">
+                                                                DUE DATE :</td>
+                                                            <td style="width: 100px">
+                                                                <asp:TextBox ID="TextBox3" runat="server" ForeColor="#FFFFFF" Style="background-color: transparent"></asp:TextBox></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="width: 100px">
+                                                            </td>
+                                                            <td style="width: 100px">
+                                                                <asp:ImageButton ID="ImageButton1" runat="server" ForeColor="#00CC00" OnClick="ImageButton1_Click" /><br />
+                                                                <asp:Calendar ID="Calendar1" runat="server" BackColor="White" BorderColor="#3366CC"
+                                                                    BorderWidth="1px" CellPadding="1" DayNameFormat="Shortest" Font-Names="Verdana"
+                                                                    Font-Size="8pt" ForeColor="#003399" Height="196px" OnSelectionChanged="Calendar1_SelectionChanged"
+                                                                    Width="216px">
+                                                                    <SelectedDayStyle BackColor="#009999" Font-Bold="True" ForeColor="#CCFF99" />
+                                                                    <SelectorStyle BackColor="#99CCCC" ForeColor="#336666" />
+                                                                    <WeekendDayStyle BackColor="#CCCCFF" />
+                                                                    <TodayDayStyle BackColor="#99CCCC" ForeColor="White" />
+                                                                    <OtherMonthDayStyle ForeColor="#999999" />
+                                                                    <NextPrevStyle Font-Size="8pt" ForeColor="#CCCCFF" />
+                                                                    <DayHeaderStyle BackColor="#99CCCC" ForeColor="#336666" Height="1px" />
+                                                                    <TitleStyle BackColor="#003399" BorderColor="#3366CC" BorderWidth="1px" Font-Bold="True"
+                                                                        Font-Size="10pt" ForeColor="#CCCCFF" Height="25px" />
+                                                                </asp:Calendar>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </asp:Panel>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 100px; height: 250px; text-align: center">
+                        <span style="color: #ffffff">&nbsp;
+                            <asp:Panel ID="Panel2" runat="server">
+                                <div style="text-align: center">
+                                    &nbsp;&nbsp;
+                                    <table style="width: 424px">
+                                        <tr>
+                                            <td style="width: 100px; height: 40px">
+                                                SUPPLIER DETAILS</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 100px; height: 51px">
+                                                NAME : &nbsp;
+                                                <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="True" DataSourceID="SqlDataSource2"
+                                                    DataTextField="name" DataValueField="name" Font-Bold="True" ForeColor="#003366"
+                                                    OnSelectedIndexChanged="DropDownList1_SelectedIndexChanged">
+                                                </asp:DropDownList>
+                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<br />
+                                                &nbsp; &nbsp; SUPPLIER ID:&nbsp; &nbsp;
+                                                <asp:Label ID="Label1" runat="server" Text="Label"></asp:Label>
+                                                <asp:SqlDataSource ID="SqlDataSource2" runat="server"<%-- ConnectionString="<%$ ConnectionStrings:bg11ConnectionString %>"--%>>
+                                                    SelectCommand="SELECT [name] FROM [supplier]"></asp:SqlDataSource>
+                                                &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+                                                <br />
+                                                <br />
+                                                <asp:Button ID="Button7" runat="server" OnClick="Button7_Click" Text="SAVE " /></td>
+                                        </tr>
+                                    </table>
+                                    &nbsp;</div>
+                            </asp:Panel>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 100px; text-align: center">
+                        <asp:Panel ID="Panel3" runat="server">
+                            <div style="text-align: center">
+                                <table style="width: 628px; height: 61px">
+                                    <tr>
+                                        <td colspan="3">
+                                            <span style="font-size: 16pt; color: #ffffff">PURCHASE ORDER DETAILS</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 245px">
+                                            <span style="color: #ffffff">CATEGORY ID :
+                                                <asp:DropDownList ID="DropDownList2" runat="server" DataSourceID="SqlDataSource1"
+                                                    DataTextField="catid" DataValueField="catid" OnSelectedIndexChanged="DropDownList2_SelectedIndexChanged1">
+                                                </asp:DropDownList><asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:bg11ConnectionString4 %>"
+                                                    SelectCommand="SELECT [catid] FROM [stock]"></asp:SqlDataSource>
+                                                &nbsp; &nbsp;&nbsp;<br />
+                                                <asp:Panel ID="Panel5" runat="server">
+                                                    ITEM<asp:DropDownList ID="DropDownList3" runat="server" DataSourceID="SqlDataSource3"
+                                                        DataTextField="it_name" DataValueField="it_name">
+                                                    </asp:DropDownList>
+                                                    NAME :&nbsp;</asp:Panel>
+                                                &nbsp;<asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:bg11ConnectionString6 %>"
+                                                    SelectCommand="SELECT [it_name] FROM [stock] WHERE ([catid] = @catid)">
+                                                    <SelectParameters>
+                                                        <asp:ControlParameter ControlID="DropDownList2" Name="catid" PropertyName="SelectedValue"
+                                                            Type="String" />
+                                                    </SelectParameters>
+                                                </asp:SqlDataSource>
+                                            </span>&nbsp;<br />
+                                            &nbsp;<span style="color: #ffffff">&nbsp;<br />
+                                                ITEM ID: &nbsp; &nbsp;</span><asp:Label ID="Label2" runat="server" ForeColor="#FFFFFF"
+                                                    Text="Label"></asp:Label></td>
+                                        <td style="width: 125px">
+                                            <span style="color: #ffffff">QUANTITY : </span>
+                                            <asp:TextBox ID="TextBox4" runat="server" ForeColor="#FFFFFF" Style="background-color: transparent"></asp:TextBox></td>
+                                        <td style="width: 100px">
+                                            <asp:Button ID="Button1" runat="server" Font-Bold="True" ForeColor="#FFCC66" OnClick="Button1_Click"
+                                                Style="background-color: transparent" Text="NEXT PURCHASE" /></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </asp:Panel>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 100px; text-align: center">
+                        <asp:Panel ID="Panel4" runat="server">
+                            <div style="text-align: center">
+                                <table style="width: 410px; height: 57px">
+                                    <tr>
+                                        <td style="width: 100px">
+                                            <asp:GridView ID="GridView1" runat="server" ForeColor="#FFFFFF" OnSelectedIndexChanged="GridView1_SelectedIndexChanged">
+                                            </asp:GridView>
+                                        </td>
+                                        <td style="width: 100px">
+                                            <asp:Button ID="Button2" runat="server" Font-Bold="True" ForeColor="#FFCC66" Style="background-color: transparent"
+                                                Text="ADD NEW ITEM" /></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </asp:Panel>
+                        <br />
+                        <br />
+                        <div style="text-align: center">
+                            &nbsp; &nbsp;
+                            <table style="width: 600px">
+                                <tr>
+                                    <td style="width: 100px">
+                                        <asp:Button ID="Button3" runat="server" Font-Bold="True" ForeColor="#FFCC66" OnClick="Button3_Click"
+                                            Style="background-color: transparent" Text="PLACE ORDER" /></td>
+                                    <td style="width: 100px">
+                                        <asp:Button ID="Button4" runat="server" Font-Bold="True" ForeColor="#FFCC66" Style="background-color: transparent"
+                                            Text="BILL" /></td>
+                                    <td style="width: 100px">
+                                        <asp:Button ID="Button5" runat="server" Font-Bold="True" ForeColor="#FFCC66" OnClick="Button5_Click"
+                                            Style="background-color: transparent" Text="VEIW ORDER" /></td>
+                                    <td style="width: 100px">
+                                        <asp:Button ID="Button6" runat="server" Font-Bold="True" ForeColor="#FFCC66" Style="background-color: transparent"
+                                            Text="SEARCH ORDER" /></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </center>
+    </div>
+</asp:Content>
+

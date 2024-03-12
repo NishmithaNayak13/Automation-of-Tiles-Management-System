@@ -1,0 +1,15 @@
+﻿body 
+{
+	margin :0;
+	padding :0;
+}
+.formbox
+{
+	height :650px;
+	width :400px;
+	background-position :center;
+	position :absolute ;
+	background:rgba(0,0,0,0.3);
+	border-style:groove;
+}
+

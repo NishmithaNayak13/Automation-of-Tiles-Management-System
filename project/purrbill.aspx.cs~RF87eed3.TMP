@@ -1,0 +1,508 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.Data.SqlClient;
+using System.Windows.Forms;
+
+public partial class purrbill : System.Web.UI.Page
+{
+    connect c;
+    DataSet ds,ds1;
+    SqlDataAdapter adp = new SqlDataAdapter();
+    SqlDataAdapter adp1 = new SqlDataAdapter();
+    DataTable dt = new DataTable();
+    string billno = "BILLNO";
+    double p, tp, gt = 0, grand;
+    int q;
+    string id;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        MaintainScrollPositionOnPostBack = true;
+        Calendar1.Visible = false;
+        Calendar2.Visible = false;
+       // Panel1.Visible = false;
+//Panel2.Visible = false;
+       // Panel6.Visible = false;
+        DateTime dt = System.DateTime.Now;
+        Label2.Text = Convert.ToString(dt.Date);
+        txtbilldate.Text = Convert.ToString(dt.Date.ToShortDateString());
+       // btnhome.Visible = false;
+       // btnnext.Visible = false;
+        c = new connect();
+        c.cmd.CommandText = "select po_no from porder where status='unpaid'";
+        ds = new DataSet();
+        adp.SelectCommand = c.cmd;
+        adp.Fill(ds, "sup");
+        {
+            if (ddlorderno.Items.Count == 0)
+            {
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    ddlorderno.Items.Add("select");
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        id = Convert.ToString(ds.Tables[0].Rows[i]["po_no"]);
+                        ddlorderno.Items.Add(id.ToString());
+                    }
+                }
+            }
+        }
+
+    }
+    protected void btnnew_Click(object sender, EventArgs e)
+    {
+        c = new connect();
+        Panel1.Visible = true;
+        Panel2.Visible = true;
+        btnnext.Visible = true;
+        if (IsPostBack)
+        {
+            c.cmd.CommandText = "select count(*) from purbill";
+            int i = Convert.ToInt16(c.cmd.ExecuteScalar());
+            i++;
+            txtbillno.Text = billno + i.ToString();
+        }
+        btnhome.Visible = true;
+        btnnext.Visible = true;
+   
+    }
+    protected void ddlproid_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            c = new connect();
+            ds = new DataSet();
+            ds1 = new DataSet();
+            txtprice.Text = "";
+            txttotal.Text = "";
+            c.cmd.CommandText = "select * from podetails where po_no='" + ddlorderno.SelectedItem.Text + "'and item_id='" + ddlproid.SelectedItem.Text + "'";
+            adp.SelectCommand = c.cmd;
+            adp.Fill(ds, "pur");
+            if (ds.Tables["pur"].Rows.Count > 0)
+            {
+                c.cmd.CommandText = "select * from stock where item_id='" + ddlproid.SelectedItem.Text + "'";
+                adp.SelectCommand = c.cmd;
+                adp.Fill(ds1, "t");
+                if (ds1.Tables["t"].Rows.Count > 0)
+                {
+
+                    txtqty.Text = Convert.ToString(ds.Tables["pur"].Rows[0].ItemArray[2]);
+                    txtprice.Text = Convert.ToString(ds1.Tables["t"].Rows[0].ItemArray[4]);
+                    txtname.Text = Convert.ToString(ds1.Tables["t"].Rows[0].ItemArray[3]);
+                }
+                else
+                {
+                    MessageBox.Show("no records found11111 ");
+                }
+            }
+            else
+            {
+                MessageBox.Show("no records found 22222");
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+        }
+    protected void btnsave_Click(object sender, EventArgs e)
+    {
+        c = new connect();
+        ds = new DataSet();
+        int qty1, qty2;
+        c.cmd.CommandText = "insert into pbdetails values(@bil_no,@item_id,@amt,@no_of_pc,@price)";
+        c.cmd.Parameters.Clear();
+        if(txtprice .Text !="")
+        {
+            c.cmd .Parameters .Add ("@bil_no",SqlDbType .NVarChar ).Value =txtbillno .Text ;
+            c.cmd .Parameters .Add ("@item_id",SqlDbType .NVarChar ).Value =ddlproid .Text ;
+            c.cmd.Parameters .Add ("@amt",SqlDbType .Decimal ).Value =Convert .ToDecimal (txtprice.Text );
+            c.cmd.Parameters .Add ("@no_of_pc",SqlDbType.SmallInt ).Value =Convert .ToInt16 (txtqa.Text );
+            c.cmd.Parameters .Add ("@price",SqlDbType .Decimal ).Value =Convert .ToDecimal (txttotal .Text  );
+            c.cmd.ExecuteNonQuery ();
+            c.cmd.CommandText = "update porder set status='paid' where po_no='" + ddlorderno.SelectedItem.Text + "'";
+            c.cmd.ExecuteNonQuery();
+            Session ["billno"]=txtbillno .Text ;
+            c.cmd .CommandText ="select * from purbill where bill_no='"+txtbillno .Text +"'";
+            adp.SelectCommand =c.cmd ;
+           ds =new DataSet ();
+            adp.Fill(ds,"pur");
+            if(ds.Tables ["pur"].Rows .Count >0)
+            {
+                c.cmd .CommandText ="update purbill set bill_no='"+txtbillno .Text +"',"+"po_no='"+ddlorderno .SelectedItem .Text +"',"+"s_billno='"+txtsbno .Text +"',"+"p_date='"+txtsbdate .Text +"',"+"rdate='"+txtrdate .Text +"',"+"gtot='"+txtgtotal .Text +"'"+" where bill_no='"+txtbillno .Text +"'";
+                c.cmd .ExecuteNonQuery ();
+            }
+            else 
+            {
+                c.cmd.CommandText ="insert into purbill values(@bill_no,@po_no,@p_date,@s_billno,@gtot)";
+            c.cmd.Parameters .Clear ();
+            c.cmd .Parameters .Add ("@bill_no",SqlDbType.NVarChar  ).Value =txtbillno .Text;
+            c.cmd .Parameters .Add ("@po_no",SqlDbType .NVarChar ).Value =ddlorderno .SelectedItem .Text ;
+            c.cmd .Parameters .Add ("@p_date",SqlDbType .DateTime ).Value=txtsbdate .Text;
+            c.cmd .Parameters .Add ("@s_billno",SqlDbType .NVarChar  ).Value =txtsbno .Text ;
+            c.cmd .Parameters .Add ("@gtot",SqlDbType .Decimal ).Value =Convert .ToDecimal (txtgtotal .Text );
+            // c.cmd .Parameters .Add ("@rdate",SqlDbType .DateTime ).Value=txtrdate .Text ;
+
+            c.cmd .ExecuteNonQuery ();
+            }
+            Session ["gtotal"]=txtgtotal .Text ;
+            c.cmd .CommandText ="select no_of_box from stock where item_id='"+ddlproid .SelectedItem .ToString() +"'";
+            adp .SelectCommand =c.cmd ;
+            adp.Fill(ds,"stk");
+            if(ds.Tables ["stk"].Rows .Count >0)
+            {
+                qty1=Convert .ToInt16(ds.Tables ["stk"].Rows[0].ItemArray [0]);
+                qty2=qty1+Convert .ToInt16 (txtqty .Text );
+                c.cmd .CommandText ="update stock set no_of_box=@no_of_box where item_id='"+ddlproid .SelectedItem .ToString ()+"'";
+                c.cmd .Parameters .Add ("@no_of_box",SqlDbType .SmallInt).Value =qty2 ;
+                c.cmd .ExecuteNonQuery ();
+                MessageBox .Show ("records inserted");
+                ddlproid .SelectedItem .Enabled =false ;
+                ddlproid.SelectedIndex = 0;
+                txtqty.Text = "";
+                txttotal .Text ="";
+                txtprice .Text ="";
+                txtqr .Text ="";
+                txtqa .Text ="";
+                txtgtotal .Text ="";
+                c.cmd .CommandText ="select * from purbill where bill_no='"+Session ["billno"]+"'";
+                ds =new DataSet ();
+                adp.Fill (ds,"purch");
+                if (ds.Tables ["purch"].Rows.Count >0)
+                {
+                    GridView1 .DataSource =ds.Tables ["purch"];
+                    GridView1 .DataBind ();
+                }
+                c.cmd .CommandText ="select * from pbdetails where bill_no='"+Session ["billno"]+"'";
+                ds =new DataSet ();
+                adp.Fill (ds,"purch");
+                if (ds.Tables ["purch"].Rows.Count >0)
+                {
+                    GridView2 .DataSource =ds.Tables ["purch"];
+                    GridView2 .DataBind ();
+                }
+            }
+            else 
+            {
+                MessageBox .Show ("no records found ");
+            }
+        }
+        else 
+        {
+            MessageBox .Show ("must enter price");
+        }
+        //Session["qr"] = txtrej.Text;
+        //Session ["q"]=txtqty .Text ;
+    }
+    protected void btnhome_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("~/homemaster.aspx");
+    }
+    protected void btncancel_Click(object sender, EventArgs e)
+    {
+        txtbilldate.Text = "";
+        txtbillno.Text = "";
+        txtsid.Text = "";
+        txtrdate.Text = "";
+        txttotal.Text = "";
+        txtgtotal.Text = "";
+        txtqty.Text = "";
+        txtprice.Text = "";
+        txtqa.Text = "";
+        txtqr.Text = ""; 
+    }
+    protected void ddlorderno_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        
+        c = new connect();
+        ds = new DataSet();
+        c.cmd.CommandText = "select * from porder where po_no='" + ddlorderno.SelectedItem.Text + "'";
+        adp.SelectCommand = c.cmd;
+        adp.Fill(ds, "pur");
+        if (ds.Tables["pur"].Rows.Count > 0)
+        {
+            ddlorderno.SelectedItem.Text = Convert.ToString(ds.Tables["pur"].Rows[0].ItemArray[0]);
+            txtorderdate.Text = Convert.ToString(ds.Tables["pur"].Rows[0].ItemArray[1]);
+            txtsid.Text = Convert.ToString(ds.Tables["pur"].Rows[0].ItemArray[2]);
+        }
+        c.cmd.CommandText = "select item_id from podetails where po_no='" + ddlorderno.Text + "'";
+        adp.SelectCommand = c.cmd;
+        adp.Fill(ds, "pur");
+        {
+            if (ddlproid.Items.Count == 0)
+            {
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    ddlproid.Items.Add("select");
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        id = Convert.ToString(ds.Tables[0].Rows[i]["item_id"]);
+                        ddlproid.Items.Add(id.ToString());
+                    }
+                }
+            }
+        }
+
+    }
+    protected void txtprice_TextChanged(object sender, EventArgs e)
+    {
+        //p = Convert.ToDouble(txtprice.Text);
+        //q = Convert.ToInt16 (txtqty.Text);
+        //tp = Convert.ToDouble(p * q);
+        //txttotal.Text = Convert.ToString(tp);
+        //c = new connect();
+        //c.cmd.CommandText = "select * from purbill where bill_no='" + txtbillno.Text + "'";
+        //adp.SelectCommand = c.cmd;
+        //adp.Fill(ds, "bill");
+        //if (ds.Tables["bill"].Rows.Count > 0)
+        //{
+        //    grand = Convert.ToDouble(ds.Tables["bill"].Rows[0].ItemArray[4]);
+        //}
+       
+        //gt = grand + (Convert.ToDouble(txttotal.Text));
+        //txtgtotal.Text = (Convert.ToString(gt));
+    }
+    protected void txttotal_TextChanged(object sender, EventArgs e)
+    {
+        
+    }
+    protected void txtqa_TextChanged(object sender, EventArgs e)
+    {
+        p = Convert.ToDouble(txtprice.Text);
+        q = Convert.ToInt16(txtqa.Text);
+        tp = Convert.ToDouble(p * q);
+        txttotal.Text = Convert.ToString(tp);
+        c = new connect();
+        c.cmd.CommandText = "select * from purbill where bill_no='" + txtbillno.Text + "'";
+        adp.SelectCommand = c.cmd;
+        adp.Fill(ds, "bill");
+        if (ds.Tables["bill"].Rows.Count > 0)
+        {
+            grand = Convert.ToDouble(ds.Tables["bill"].Rows[0].ItemArray[4]);
+        }
+
+        gt = grand + (Convert.ToDouble(txttotal.Text));
+        txtgtotal.Text = (Convert.ToString(gt));
+        double t= Convert.ToDouble(txtqr.Text);
+        int s = Convert.ToInt16(txtqa.Text);
+        double r = Convert.ToDouble(t - s);
+        txtrej.Text = Convert.ToString(r);
+    }
+    protected void btnreject_Click(object sender, EventArgs e)
+    {
+        
+        string ret = "RET";
+        //Response.Redirect("~/preturn.aspx");
+        Panel6.Visible =true ;
+        DateTime dt1 = System.DateTime.Now;
+        txtdate.Text = Convert.ToString(dt1.Date.ToShortDateString());
+        txtbill.Text = txtbillno.Text;
+        ////txtr.Text = txtqr.Text;
+        ////txtq.Text = txtqty.Text;
+        c = new connect();
+        if (IsPostBack)
+        {
+            c.cmd.CommandText = "select count(*) from preturn";
+            int i = Convert.ToInt16(c.cmd.ExecuteScalar());
+            i++;
+            txtret.Text = ret + i.ToString();
+        }
+
+        try
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("bill_no");
+            dt.Columns.Add("item_id");
+            dt.Columns.Add("item_name");
+            dt.Columns.Add("quantity_rejected");
+            dt.Columns.Add("amt");
+           
+            DataRow dr = null;
+            if (ViewState["pret"] != null)
+            {
+                for (int i = 0; i < 1; i++)
+                {
+                    dt = (DataTable)ViewState["pret"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        dr = dt.NewRow();
+                        dr["bill_no"] = txtbillno.Text;
+                        dr["item_id"] = ddlproid.SelectedItem.Text;
+                        dr["item_name"] = txtname.Text;
+                        dr["quantity_rejected"] = txtqr.Text;
+                        dr["amt"] = txtprice.Text;
+                        
+                        dt.Rows.Add(dr);
+                        GridView3.DataSource = dt;
+                        GridView3.DataBind();
+                    }
+                }
+            }
+
+            else
+            {
+                dr = dt.NewRow();
+                dr["bill_no"] = txtbillno.Text;
+                dr["item_id"] = ddlproid.SelectedItem.Text;
+                dr["item_name"] = txtname.Text;
+                dr["quantity_rejected"] = txtqr.Text;
+                dr["amt"] = txtprice.Text;
+                
+                dt.Rows.Add(dr);
+                GridView3.DataSource = dt;
+                GridView3.DataBind();
+            }
+
+            ViewState["pret"] = dt;
+            c.cmd.CommandText = "insert into preturn values(@preturnno,@billl_no,@date,@tot_no_of_pc)";
+            c.cmd.Parameters.Add("@preturnno", SqlDbType.NVarChar).Value = txtret.Text;
+            c.cmd.Parameters.Add("@billl_no", SqlDbType.NVarChar).Value = txtbill.Text;
+            c.cmd.Parameters.Add("@date", SqlDbType.DateTime).Value =Convert .ToDateTime ( txtdate.Text);
+            c.cmd.Parameters.Add("@tot_no_of_pc", SqlDbType.SmallInt).Value =5;
+                //Convert .ToInt16 ( txtr.Text);
+            c.cmd.ExecuteNonQuery();
+            
+            
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+
+    }
+    protected void txtrej_TextChanged(object sender, EventArgs e)
+    {
+        
+    }
+    protected void btnret_Click(object sender, EventArgs e)
+    {
+        c = new connect();
+        ds = new DataSet();
+        Page.ClientScript.RegisterStartupScript(this.GetType(), "msgbox", "<script>alert('Returned')</script>");
+    }
+    protected void btnnext_Click(object sender, EventArgs e)
+    {
+        try
+        
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("bill_no");
+            dt.Columns.Add("item_id");
+            dt.Columns.Add("item_name");
+        dt.Columns.Add("quantity");
+           dt.Columns.Add("amt");
+        dt.Columns.Add("price");
+          DataRow dr = null;
+          if (ViewState["pbill"] != null)
+            {
+                for (int i = 0; i < 1; i++)
+                {
+                    dt = (DataTable)ViewState["pbill"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        dr = dt.NewRow();
+                         dr["bill_no"] = txtbillno.Text;
+                         dr["item_id"] = ddlproid.SelectedItem.Text;
+                         dr["item_name"] = txtname.Text;
+                         dr["quantity"] = txtqa.Text;
+                         dr["amt"] = txtprice.Text;
+                         dr["price"] = txttotal.Text;
+                            dt.Rows.Add(dr);
+                        GridView1.DataSource = dt;
+          GridView1.DataBind();
+      }
+                }
+            }
+
+            else
+            {
+                dr = dt.NewRow();
+                dr["bill_no"] = txtbillno.Text;
+                dr["item_id"] = ddlproid.SelectedItem.Text;
+                dr["item_name"] = txtname.Text;
+                dr["quantity"] = txtqa.Text;
+                dr["amt"] = txtprice.Text;
+                dr["price"] = txttotal.Text;
+                dt.Rows.Add(dr);
+                GridView1.DataSource = dt;
+                GridView1.DataBind();
+            }
+
+            ViewState["pbill"] = dt;
+            c.cmd.CommandText = "insert into pbdetails values (@item_id,@bill_id,@no_of_pc,@amt,@price)";
+            c.cmd.Parameters.Add("@item_id", SqlDbType.NVarChar).Value = ddlproid .SelectedItem .Text ;
+            c.cmd.Parameters.Add("@bill_id", SqlDbType.NVarChar).Value = txtbillno .Text ;
+            c.cmd.Parameters.Add("@no_of_pc", SqlDbType.SmallInt).Value = Convert.ToInt16(txtqa .Text );
+            c.cmd.Parameters.Add("@amt", SqlDbType.Decimal ).Value = Convert .ToDecimal (txtprice .Text );
+            c.cmd.Parameters.Add("@price", SqlDbType.Decimal ).Value = Convert .ToDecimal (txttotal .Text );
+            
+            c.cmd.ExecuteNonQuery();
+
+        //    Session["pono"] = TextBox1.Text;
+        //    Session["iid"] = Label2.Text;
+        //    Session["qty"] = TextBox4.Text;
+        //    Session["HSN"] = Label3.Text;
+      // ddlproid.SelectedIndex=0;
+       ddlproid.SelectedItem.Enabled = false;
+      // ddlproid.SelectedValue.Remove(1);
+            txtq .Text ="";
+            txtqa .Text ="";
+            txtqr .Text ="";
+            txtprice .Text ="";
+            txttotal .Text ="";
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+    }
+    protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
+    {
+        Calendar1.Visible = true;
+    }
+    protected void ImageButton2_Click(object sender, ImageClickEventArgs e)
+    {
+        Calendar2.Visible = true ;
+    }
+    protected void Calendar2_SelectionChanged(object sender, EventArgs e)
+    {
+        txtrdate .Text  = Calendar2.SelectedDate.ToString();
+    }
+    protected void Calendar1_SelectionChanged(object sender, EventArgs e)
+    {
+        txtsbdate .Text  = Calendar1.SelectedDate.ToString();
+    }
+    protected void txtr_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void txtsbdate_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void txtdate_TextChanged(object sender, EventArgs e)
+    {
+
+    }
+}

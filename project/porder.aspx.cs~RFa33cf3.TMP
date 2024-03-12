@@ -1,0 +1,398 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.Data.SqlClient;
+using System.Windows.Forms;
+
+
+public partial class porder : System.Web.UI.Page
+{
+    connect c;
+    DataSet ds;
+    SqlDataAdapter adp = new SqlDataAdapter();
+    //int count;
+    //c.cmd.CommandText = "select count(*) from porder";
+    //        count = Convert.ToInt16(c.cmd.ExecuteScalar()) + 1;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        try
+        {
+            c = new connect();
+            ds = new DataSet();
+            c.cmd.CommandText = "select distinct(cat_id) from stock";
+            adp.SelectCommand = c.cmd;
+            adp.Fill(ds, "cc");
+            if (DropDownList2.Items.Count == 0)
+            {
+                if (ds.Tables["cc"].Rows.Count > 0)
+                {
+                   
+                     DropDownList2.Items.Add("select");
+                    int i;
+                    for (i = 0; i < ds.Tables["cc"].Rows.Count; i++)
+                    {
+                        DropDownList2.Items.Add(ds.Tables["cc"].Rows[i].ItemArray[0].ToString());
+                    }
+                }
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+       
+        // Panel3.Visible = false;
+        //Panel4.Visible = false;
+        //Button3.Visible = false;
+        //Button4.Visible  = false;
+        //Button5.Visible = false;
+        c = new connect();
+        ds = new DataSet();
+        if (!IsPostBack)
+        {
+            try
+            {
+                Calendar1.Visible = false;
+                int count;
+                TextBox2.Text = DateTime.Now.ToShortDateString();
+                c.cmd.CommandText = "select count(*) from porder";
+                count = Convert.ToInt16(c.cmd.ExecuteScalar()) + 1;
+                TextBox1.Text = "P100" + count.ToString();
+                if ((string)Session["nextpr"] == "yes")
+                {
+                    TextBox1.Text = (string)Session["pono"];
+                    TextBox2.Text = (string)Session["odate"];
+                    TextBox3.Text = (string)Session["ddate"];
+                }
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                c.cnn.Close();
+            }
+        }
+    }
+    protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
+    {
+        Calendar1.Visible = true;
+    }
+    protected void Calendar1_SelectionChanged(object sender, EventArgs e)
+    {
+        DateTime dt1 = DateTime.Now;
+        DateTime dt2 = Convert.ToDateTime(Calendar1.SelectedDate.ToString());
+        DateTime dt3 = DateTime.Now.AddDays(15);
+        if (dt2 <= dt1)
+        {
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "msgbox", "<script>alert('we cannot select date')</script>");
+            //Page.ClientScript.RegisterStartupScript(this.GetType(), "msgbox", "<script> MessageBox('we can't select date ')</script>");
+           // MessageBox.Show("we can't select date ");
+        }
+        else if (dt2 > dt3)
+        {
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "msgbox", "<script>alert('Due date must be within 15 days')</script>");
+        }
+        else
+        {
+            TextBox3.Text = Calendar1.SelectedDate.ToShortDateString();
+        }
+        if (TextBox3.Text == "")
+        {
+            Calendar1.Visible = true;
+        }
+        else
+        {
+            Calendar1.Visible = false;
+        }
+    }
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("item_id");
+            dt.Columns.Add("i_name");
+            dt.Columns.Add("tot_no_of_pc");
+            DataRow dr = null;
+            if (ViewState["porder"] != null)
+            {
+                for (int i = 0; i < 1; i++)
+                {
+                    dt = (DataTable)ViewState["porder"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        dr = dt.NewRow();
+                        dr["item_id"] = Label2.Text;
+                        dr["i_name"] = DropDownList3.SelectedItem.Text;
+                        dr["tot_no_of_pc"] = TextBox4.Text;
+                        dt.Rows.Add(dr);
+                        GridView1.DataSource = dt;
+                        GridView1.DataBind();
+                    }
+                }
+            }
+
+            else
+            {
+                dr = dt.NewRow();
+                dr["item_id"] = Label2.Text;
+                dr["i_name"] = DropDownList3.SelectedItem.Text;
+                dr["tot_no_of_pc"] = TextBox4.Text;
+                dt.Rows.Add(dr);
+                GridView1.DataSource = dt;
+                GridView1.DataBind();
+            }
+
+            ViewState["porder"]=dt ;
+            c.cmd.CommandText = "insert into podetails values (@po_no,@item_id,@tot_no_of_pc)";
+            c.cmd.Parameters.Add("@po_no", SqlDbType.NVarChar).Value = TextBox1.Text;
+            c.cmd.Parameters.Add("@item_id", SqlDbType.NVarChar).Value = Label2.Text;
+            c.cmd.Parameters.Add("@tot_no_of_pc", SqlDbType.SmallInt).Value = Convert.ToInt16(TextBox4.Text);
+            c.cmd.ExecuteNonQuery();
+
+            Session["pono"] = TextBox1.Text;
+            Session["iid"] = Label2.Text;
+            Session["qty"] = TextBox4.Text;
+            DropDownList2.SelectedIndex = 0;
+            Label2.Text = "";
+            TextBox4.Text = "";
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+    }
+
+
+    //c.cmd.CommandText = "select * from podetails";
+    //ds = new DataSet();
+    //adp.SelectCommand = c.cmd;
+    //adp.Fill(ds, "po");
+    //if (ds.Tables["po"].Rows.Count > 0)
+    //{
+    //    GridView1.DataSource = ds.Tables["po"];
+    //    GridView1.DataBind();
+    //protected void  GridView1_SelectedIndexChanged(object sender, EventArgs e)
+    //{
+
+
+    //else
+    //{
+    //    Page.ClientScript.RegisterStartupScript(this.GetType(), "msgbox", "<script>alert('Record not found')</script>");
+
+    //}
+    //    }
+    //    catch (Exception)
+    //    {
+    //        throw;
+    //    }
+    //    finally
+    //    {
+    //        c.cnn.Close();
+    //    }
+    //}
+    //protected void DropDownList2_SelectedIndexChanged(object sender, EventArgs e)
+    //{
+
+    //    try
+    //    {
+    //        c = new connect();
+    //        ds = new DataSet();
+    //        c.cmd.CommandText = "select * from stock where it_name='" + DropDownList2.SelectedItem.Text + "'";
+    //        adp.SelectCommand = c.cmd;
+    //        adp.Fill(ds, "itm");
+    //        if (ds.Tables["itm"].Rows.Count > 0)
+    //        {
+    //            for (int i = 0; i < ds.Tables["itm"].Rows.Count; i++)
+    //            {
+    //                Label2.Text = Convert.ToString(ds.Tables["itm"].Rows[i].ItemArray[1]);
+
+    //            }
+    //        }
+
+    //    }
+    //    catch (Exception)
+    //    {
+    //        throw;
+    //    }
+    //    finally
+    //    {
+    //        c.cnn.Close();
+    //    }
+    //}
+    protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+
+            c = new connect();
+            ds = new DataSet();
+            c.cmd.CommandText = "select * from supplier where name='" + DropDownList1.SelectedItem.Text + "'";
+            adp.SelectCommand = c.cmd;
+            adp.Fill(ds, "sp");
+            if (ds.Tables["sp"].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables["sp"].Rows.Count; i++)
+                {
+                    Label1.Text = Convert.ToString(ds.Tables["sp"].Rows[i].ItemArray[0]);
+
+                }
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+    }
+    protected void Button7_Click(object sender, EventArgs e)
+    {
+        try
+        {
+           
+            c = new connect();
+            c.cmd.CommandText = "insert into porder values (@po_no,@p_date,@sup_id,@due_date)";
+            c.cmd.Parameters.Add("@po_no", SqlDbType.NVarChar).Value = TextBox1.Text;
+            c.cmd.Parameters.Add("@p_date", SqlDbType.DateTime).Value = Convert.ToDateTime(TextBox2.Text);
+            c.cmd.Parameters.Add("sup_id", SqlDbType.NVarChar).Value = Label1.Text;
+            c.cmd.Parameters.Add("@due_date", SqlDbType.DateTime).Value = Convert.ToDateTime(TextBox3.Text);
+            c.cmd.ExecuteNonQuery();
+
+            Session["pono"] = TextBox1.Text;
+            Session["odate"] = TextBox2.Text;
+            Session["sid"] = Label1.Text;
+            Session["ddate"] = TextBox3.Text;
+            Panel3.Visible = true;
+            Panel4.Visible = true;
+            Button3.Visible = true ;
+            Button4.Visible = true ;
+            Button5.Visible =true ;
+            Button3.Enabled = true;
+            TextBox1.Enabled = false;
+            TextBox2.Enabled = false;
+            TextBox3.Enabled = false;
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+    }
+    protected void Button5_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("~/vieworder.aspx");
+    }
+    protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void Button3_Click(object sender, EventArgs e)
+    {
+        c = new connect();
+        ds = new DataSet();
+        try
+        {
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "msgbox", "<script>alert('order placed')</script>");
+            Button7.Enabled = true;
+            TextBox1.Enabled = true ;
+            TextBox2.Enabled = true ;
+            TextBox3.Enabled = true;
+            TextBox1.Text = "";
+            TextBox2.Text = "";
+            TextBox3.Text = "";
+            DropDownList1.SelectedIndex = 0;
+            Label1.Text = "";
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        } 
+    }
+    protected void DropDownList3_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void DropDownList2_SelectedIndexChanged1(object sender, EventArgs e)
+    {
+        //Panel5.Visible = true;
+        try
+        {
+
+            c = new connect();
+            ds = new DataSet();
+            c.cmd.CommandText = "select * from stock where cat_id='" + DropDownList2.SelectedItem.Text + "'";
+            adp.SelectCommand = c.cmd;
+            adp.Fill(ds, "pa");
+            if (ds.Tables["pa"].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables["pa"].Rows.Count; i++)
+                {
+                   DropDownList3 .Items .Add ( Convert.ToString(ds.Tables["pa"].Rows[i].ItemArray[2]));
+
+                }
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+    }
+    protected void DropDownList3_SelectedIndexChanged1(object sender, EventArgs e)
+    {
+        try
+        {
+
+            c = new connect();
+            ds = new DataSet();
+            c.cmd.CommandText = "select * from stock where it_name='" + DropDownList3.SelectedItem.Text + "'";
+            adp.SelectCommand = c.cmd;
+            adp.Fill(ds, "it");
+            if (ds.Tables["it"].Rows.Count > 0)
+            {
+                for (int i = 0; i < ds.Tables["it"].Rows.Count; i++)
+                {
+                    Label2.Text = Convert.ToString(ds.Tables["it"].Rows[i].ItemArray[1]);
+
+                }
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+    }
+}

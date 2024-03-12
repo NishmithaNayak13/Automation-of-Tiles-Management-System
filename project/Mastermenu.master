@@ -1,0 +1,88 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Mastermenu.master.cs" Inherits="Mastemenu" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<script runat="server">
+</script>
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head id="Head1" runat="server">
+    <title>Untitled Page</title>
+</head>
+<body style="background-image: url(img/adforgot.jpg);">
+    <form id="form1" runat="server">
+    <div>
+        <br />
+        <asp:Menu ID="Menu1" runat="server" Font-Size="16pt" ForeColor="#FFCC66" Orientation="Horizontal" Font-Bold="True" Height="57px" Width="737px">
+            <DynamicItemTemplate>
+                <%# Eval("Text") %>
+            </DynamicItemTemplate>
+            <Items>
+                <asp:MenuItem Text="HOME" Value="HOME">
+                    <asp:MenuItem NavigateUrl="~/register.aspx" Text="LOGIN" Value="LOGIN">
+                    </asp:MenuItem>
+                </asp:MenuItem>
+                <asp:MenuItem NavigateUrl="~/purchase.aspx" Text="PURCHASE" Value="PURCHASE">
+                    <asp:MenuItem Text="SUPLIER DETAILS" Value="SUPLIER DETAILS">
+                        <asp:MenuItem NavigateUrl="~/supadd.aspx" Text="ADD SUPPLIER" Value="ADD SUPPLIER"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/supremove.aspx" Text="REMOVE SUPPLIER" Value="REMOVE SUPPLIER">
+                        </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/supupdate.aspx" Text="UPDATE SUPPLIER" Value="UPDATE SUPPLIER">
+                        </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/supsearch.aspx" Text="SEARCH SUPPLIER" Value="SEARCH SUPPLIER">
+                        </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/supactivate.aspx" Text="ACTIVATE SUPPLIER" Value="ACTIVATE SUPPLIER">
+                        </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/supdisplay.aspx" Text="DISPLAY SUPPLIER DETAILS" Value="DISPLAY SUPPLIER DETAILS">
+                        </asp:MenuItem>
+                    </asp:MenuItem>
+                    <asp:MenuItem Text="PURCHASE DETAILS" Value="PURCHASE DETAILS" NavigateUrl="~/porder.aspx"></asp:MenuItem>
+                    <asp:MenuItem Text="PURCHASE BILL" Value="PURCHASE BILL" NavigateUrl="~/purrbill.aspx"></asp:MenuItem>
+                    <asp:MenuItem Text="PURCHASE RETURN DETAILS" Value="PURCHASE RETURN DETAILS"></asp:MenuItem>
+                </asp:MenuItem>
+                <asp:MenuItem Text="SALES" Value="SALES">
+                    <asp:MenuItem Text="CUSTOMER DETAILS" Value="CUSTOMER DETAILS">
+                        <asp:MenuItem NavigateUrl="~/custadd.aspx" Text="ADD" Value="ADD"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/custupdate.aspx" Text="UPDATE" Value="UPDATE"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/custsearch.aspx" Text="SEARCH" Value="SEARCH"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/custdisplay.aspx" Text="DISPLAY" Value="DISPLAY"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/custremove.aspx" Text="REMOVE" Value="REMOVE"></asp:MenuItem>
+                    </asp:MenuItem>
+                    <asp:MenuItem NavigateUrl="~/sorder.aspx" Text="SALES DETAILS" Value="SALES DETAILS">
+                    </asp:MenuItem>
+                    <asp:MenuItem Text="SALES BILL" Value="SALES BILL" NavigateUrl="~/salesbill.aspx"></asp:MenuItem>
+                </asp:MenuItem>
+                <asp:MenuItem Text="EMPLOYEE" Value="EMPLOYEE">
+                    <asp:MenuItem Text="EMPLOYEE DETAILS" Value="EMPLOYEE DETAILS">
+                        <asp:MenuItem NavigateUrl="~/empadd.aspx" Text="ADD" Value="ADD"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/empupdate.aspx" Text="UPDATE" Value="UPDATE"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/empdisplay.aspx" Text="DISPLAY" Value="DISPLAY"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/empsearch.aspx" Text="SEARCH" Value="SEARCH"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/empremove.aspx" Text="REMOVE" Value="REMOVE"></asp:MenuItem>
+                    </asp:MenuItem>
+                    <asp:MenuItem Text="ATTENDANCE" Value="ATTENDANCE">
+                        <asp:MenuItem NavigateUrl="~/attendanceadd.aspx" Text="ADD ATTENDANCE" Value="ADD ATTENDANCE">
+                        </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/attendancedisplay.aspx" Text="DISPLAY" Value="DISPLAY">
+                        </asp:MenuItem>
+                    </asp:MenuItem>
+                    <asp:MenuItem Text="PAYSLIP" Value="PAYSLIP">
+                        <asp:MenuItem NavigateUrl="~/payslipdisplay.aspx" Text="DISPLAY" Value="DISPLAY"></asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/payslip.aspx" Text="NEW PAYSLIP" Value="NEW PAYSLIP"></asp:MenuItem>
+                    </asp:MenuItem>
+                </asp:MenuItem>
+                <asp:MenuItem Text="USER MANAGEMENT" Value="USER MANAGEMENT">
+                    <asp:MenuItem NavigateUrl="~/adduser.aspx" Text="ADD USER" Value="ADD USER"></asp:MenuItem>
+                </asp:MenuItem>
+            </Items>
+            <StaticItemTemplate>
+                <%# Eval("Text") %>
+            </StaticItemTemplate>
+        </asp:Menu>
+        <br />
+        <br />
+        <asp:contentplaceholder id="ContentPlaceHolder1" runat="server">
+        </asp:contentplaceholder>
+    </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<%@ Page Language="C#" MasterPageFile="~/Mastermenu.master" AutoEventWireup="true" CodeFile="preturn.aspx.cs" Inherits="preturn" Title="Untitled Page" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <div style="text-align: center">
+        <table style="color: #ffffff">
+            <tr>
+                <td colspan="2">
+                    PURCHASE RETURN</td>
+            </tr>
+            <tr>
+                <td style="width: 100px">
+                    PURCHASE RETURN NO</td>
+                <td style="width: 100px">
+                    <asp:TextBox ID="txtret" runat="server"></asp:TextBox></td>
+            </tr>
+            <tr>
+                <td style="width: 100px">
+                    BILL NO</td>
+                <td style="width: 100px">
+                    <asp:TextBox ID="txtbillno" runat="server"></asp:TextBox></td>
+            </tr>
+            <tr>
+                <td style="width: 100px">
+                    DATE</td>
+                <td style="width: 100px">
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 100px">
+                    QUANTITY</td>
+                <td style="width: 100px">
+                </td>
+            </tr>
+        </table>
+    </div>
+</asp:Content>
+

@@ -1,0 +1,154 @@
+using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.Data.SqlClient;
+using System.Windows.Forms;
+
+public partial class purbill : System.Web.UI.Page
+{
+    connect c;
+    DataSet ds;
+    SqlDataAdapter adp = new SqlDataAdapter();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        c = new connect();
+        ds = new DataSet();
+        if (!IsPostBack)
+        {
+            try
+            {
+               
+                int count;
+                TextBox2.Text = DateTime.Now.ToShortDateString();
+                c.cmd.CommandText = "select count(*) from purbill";
+                count = Convert.ToInt16(c.cmd.ExecuteScalar()) + 1;
+                TextBox1.Text = "B100" + count.ToString();
+
+                    //TextBox9.Text = (string)Session["pono"];
+                   // TextBox5.Text = (string)Session["odate"];
+                if (DropDownList1.Items.Count == 0)
+                    {
+                        c.cmd.CommandText = "select distinct(po_no) from porder";
+                        adp.SelectCommand = c.cmd;
+                        adp.Fill(ds, "o");
+                        if (ds.Tables["o"].Rows.Count > 0)
+                        {
+                            DropDownList1.Items.Add("select");
+                            int i;
+                            for (i = 0; i < ds.Tables["o"].Rows.Count; i++)
+                            {
+                               DropDownList1 .Items.Add(ds.Tables["o"].Rows[i].ItemArray[0].ToString());
+                               //TextBox5.Text = Convert.ToString(ds.Tables["o"].Rows[i].ItemArray[1]);
+                               //TextBox3.Text = Convert.ToString(ds.Tables["o"].Rows[i].ItemArray[2]);
+                            }
+                        }
+                    }
+
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                c.cnn.Close();
+            }
+        }
+    }
+    protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            c = new connect();
+            ds = new DataSet();
+            c.cmd.CommandText = "select * from porder where po_no='" + DropDownList1.SelectedItem.Text + "'";
+            adp.SelectCommand = c.cmd;
+            adp.Fill(ds, "p");
+            
+                if (ds.Tables["p"].Rows.Count > 0)
+                {
+                   // DropDownList1.Items.Add("select");
+                    for (int i = 0; i < ds.Tables["p"].Rows.Count; i++)
+                    {
+                        DropDownList2.Items.Add("select");
+                        TextBox5.Text = Convert.ToString(ds.Tables["p"].Rows[i].ItemArray[1]);
+
+
+                        //  TextBox3.Text = Convert.ToString(ds.Tables["p"].Rows[i].ItemArray[2]);
+                        DropDownList2.Items.Add(Convert.ToString(ds.Tables["p"].Rows[i].ItemArray[2]));
+                    }
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    protected void TextBox3_TextChanged(object sender, EventArgs e)
+    {
+        //try
+        //{
+        //    c = new connect();
+        //    ds = new DataSet();
+        //    c.cmd.CommandText = "select * from supplier where sup_id='" + TextBox3 .Text + "'";
+        //    adp.SelectCommand = c.cmd;
+        //    adp.Fill(ds, "z");
+        //  // if(ddl1 .SelectedIndex ==0)
+            
+        //    if (ds.Tables["z"].Rows.Count > 0)
+        //    {
+        //        for (int i = 0; i < ds.Tables["z"].Rows.Count; i++)
+        //        {
+        //            Label1.Text = Convert.ToString(ds.Tables["z"].Rows[i].ItemArray[1]);
+        //            //TextBox4.Text = Convert.ToString(ds.Tables["z"].Rows[i].ItemArray[1]);
+        //            //TextBox3.Text = Convert.ToString(ds.Tables["p"].Rows[i].ItemArray[2]);
+        //        }
+        //    }
+
+        //}
+        //catch (Exception)
+        //{
+        //    throw;
+        //}
+    }
+    protected void DropDownList2_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+
+            c = new connect();
+            ds = new DataSet();
+            c.cmd.CommandText = "select * from supplier where sup_id='" + DropDownList2.SelectedItem.Text + "'";
+            adp.SelectCommand = c.cmd;
+            adp.Fill(ds, "y");
+            
+                if (ds.Tables["y"].Rows.Count > 0)
+                {
+                    
+                    for (int i = 0; i < ds.Tables["y"].Rows.Count; i++)
+                    {
+                        
+                       Label1 .Text = Convert.ToString(ds.Tables["y"].Rows[i].ItemArray[1]);
+                    }
+                }
+            
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            c.cnn.Close();
+        }
+    }
+}
+
